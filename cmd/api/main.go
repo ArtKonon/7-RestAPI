@@ -10,12 +10,15 @@ import (
 
 func main() {
 	addr := ":8080"
-	if p := os.Getenv("PORT"); p != "" {
-		addr = ":" + p
+	port := os.Getenv("PORT")
+	if port != "" {
+		addr = ":" + port
 	}
 
 	log.Printf("listening on %s", addr)
-	if err := http.ListenAndServe(addr, app.NewRouter()); err != nil {
+	handler := app.NewRouter()
+	err := http.ListenAndServe(addr, handler)
+	if err != nil {
 		log.Fatal(err)
 	}
 }

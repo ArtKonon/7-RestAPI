@@ -4,7 +4,10 @@
 // organise the rest of the code (model, repository, handler, middleware) as you like.
 package app
 
-import "net/http"
+import (
+	"net/http"
+	"github.com/gin-gonic/gin"
+)
 
 // NewRouter must return a fully configured HTTP handler for your resource.
 //
@@ -13,9 +16,38 @@ import "net/http"
 //   - it must be safe for concurrent requests;
 //   - it can be built with net/http, gin, chi or any other router.
 //
-// TODO: replace this stub with your implementation.
+
+
+
 func NewRouter() http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		http.Error(w, "not implemented", http.StatusNotImplemented)
-	})
+
+	router := gin.Default() // підключає middleware: Logger і Recovery
+
+	books := router.Group("/books")
+	{ 
+		books.GET("", func(c *gin.Context) {
+			c.JSON(http.StatusNotImplemented, gin.H{"error": "not implemented"})
+		})
+		// GET /books/{id} - отримати книгу за ID
+		books.GET("/:id", func(c *gin.Context) {
+			c.JSON(http.StatusNotImplemented, gin.H{"error": "not implemented"})
+		})
+		
+		// POST /books - додати нову книгу
+		books.POST("", handler.CreateBook)
+		
+		// PUT /books/{id} - оновити книгу
+		books.PUT("/:id", func(c *gin.Context) {
+			c.JSON(http.StatusNotImplemented, gin.H{"error": "not implemented"})
+		})
+		
+		// DELETE /books/{id} - видалити книгу
+		books.DELETE("/:id", func(c *gin.Context) {
+			c.JSON(http.StatusNotImplemented, gin.H{"error": "not implemented"})
+		})
+	}
+
+	return router
+
+
 }
