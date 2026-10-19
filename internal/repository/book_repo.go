@@ -2,31 +2,92 @@
 package repository
 
 import (
-	"sync"
-	"homework/internal/model"
-	"github.com/google/uuid"
+    "sort"
+    "sync"
+    "time"
+
+    "homework/internal/model"
 )
 
 type BookRepository struct {
-	mutex    sync.RWMutex
-	books map[string]model.Book
+	mutex     sync.RWMutex
+	books  map[int]model.Book
+	nextID int
 }
 
 func NewBookRepository() *BookRepository {
 	return &BookRepository{
-		books: make(map[string]model.Book),
+		books:  make(map[int]model.Book),
+		nextID: 1,
 	}
 }
 
-// приклад створення книги для репозиторію
-func (bookRepo *BookRepository) Create(book model.Book) model.Book {
-	bookRepo.mutex.Lock()
-	defer bookRepo.mutex.Unlock()
-	
-	book.ID = uuid.New().String()
-	bookRepo.books[book.ID] = book
+func (repo *BookRepository) Create(book model.Book) model.Book {
+	repo.mutex.Lock()
+	defer repo.mutex.Unlock()
+
+	book.ID = repo.nextID
+	now := time.Now().UTC()
+	book.CreatedAt = now
+	book.UpdatedAt = now
+
+	repo.books[book.ID] = book
+	repo.nextID++
+
 	return book
 }
 
-// протрібно ще зробити методи GetAll, GetByID, Update, Delete для CRUD
+func (repo *BookRepository) GetByID(id int) (model.Book, bool) {
+	repo.mutex.RLock()
+	defer repo.mutex.RUnlock()
+
+	book, ok := repo.books[id]
+	return book, ok
+}
+
+func (repo *BookRepository) List() []model.Book {
+	repo.mutex.RLock()
+	defer repo.mutex.RUnlock()
+
+	ids := make([]int, 0, len(repo.books))
+	for id := range repo.books {
+		ids = append(ids, id)
+	}
+	sort.Ints(ids)
+
+	out := make([]model.Book, 0, len(ids))
+	for _, id := range ids {
+		out = append(out, repo.books[id])
+	}
+	return out
+}
+
+func (r *BookRepository) Update(id int, newBook model.Book) (model.Book, bool) {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+
+	old, ok := r.books[id]
+	if !ok {
+		return model.Book{}, false
+	}
+
+	newBook.ID = id
+	newBook.CreatedAt = old.CreatedAt
+	newBook.UpdatedAt = time.Now().UTC()
+
+	r.books[id] = newBook
+	return newBook, true
+}
+
+func (r *BookRepository) Delete(id int) bool {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+
+	if _, ok := r.books[id]; !ok {
+		return false
+	}
+
+	delete(r.books, id)
+	return true
+}
 

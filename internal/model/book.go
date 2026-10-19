@@ -1,12 +1,16 @@
 // Package model holds the domain type and the request structs for your resource.
 package model
 
+import "time"
+
 type Book struct {
-	ID            string `json:"id"`
-	Title         string `json:"title" binding:"required"`
-	ISBN          string `json:"isbn"`
-	Author        string `json:"author"`         // тимчасово текстове поле
-	Category      string `json:"category"`       // тимчасово текстове поле
-	PublishedYear int    `json:"published_year"`
-	Description   string `json:"description"`
+    ID            int       `json:"id"`
+    Title         string    `json:"title"`
+    ISBN          string    `json:"isbn"`
+    Author        string    `json:"author"`
+    Category      string    `json:"category"`
+    PublishedYear *int      `json:"published_year"`
+    Description   *string   `json:"description"`
+    CreatedAt     time.Time `json:"created_at"`
+    UpdatedAt     time.Time `json:"updated_at"`
 } 
