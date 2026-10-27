@@ -2,15 +2,15 @@
 package repository
 
 import (
-    "sort"
-    "sync"
-    "time"
+	"sort"
+	"sync"
+	"time"
 
-    "homework/internal/model"
+	"homework/internal/model"
 )
 
 type BookRepository struct {
-	mutex     sync.RWMutex
+	mutex  sync.RWMutex
 	books  map[int]model.Book
 	nextID int
 }
@@ -90,4 +90,3 @@ func (r *BookRepository) Delete(id int) bool {
 	delete(r.books, id)
 	return true
 }
-
