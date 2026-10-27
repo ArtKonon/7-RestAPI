@@ -1,43 +1,36 @@
 package app
 
 import (
-    "net/http"
+	"net/http"
 
-    "github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin"
 
-    "homework/internal/handler"
-    "homework/internal/repository"
+	"homework/internal/handler"
+	"homework/internal/middleware"
+	"homework/internal/repository"
 )
 
 func NewRouter() http.Handler {
-    router := gin.Default()
+	router := gin.New()
+	router.Use(middleware.Logger())
+	router.Use(middleware.Recovery())
+	router.Use(middleware.CORS())
 
-    router.Use(func(c *gin.Context) {
-        c.Header("Access-Control-Allow-Origin", "*")
-        c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-        c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization")
-        if c.Request.Method == http.MethodOptions {
-            c.Status(http.StatusNoContent)
-            return
-        }
-        c.Next()
-    })
+	repo := repository.NewBookRepository()
+	bookHandler := handler.NewBookHandler(repo)
 
-    repo := repository.NewBookRepository()
-    bookHandler := handler.NewBookHandler(repo)
+	router.GET("/health", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{"status": "ok"})
+	})
 
-    router.GET("/health", func(c *gin.Context) {
-        c.JSON(http.StatusOK, gin.H{"status": "ok"})
-    })
-
-    api := router.Group("/api/v1")
-    books := api.Group("/books")
+	api := router.Group("/api/v1")
+	books := api.Group("/books")
 
 	books.POST("", bookHandler.CreateBook)
-    books.GET("", bookHandler.ListBooks)
-    books.GET("/:id", bookHandler.GetBook)
-    books.PUT("/:id", bookHandler.UpdateBook)
-    books.DELETE("/:id", bookHandler.DeleteBook)
+	books.GET("", bookHandler.ListBooks)
+	books.GET("/:id", bookHandler.GetBook)
+	books.PUT("/:id", bookHandler.UpdateBook)
+	books.DELETE("/:id", bookHandler.DeleteBook)
 
-    return router
+	return router
 }
