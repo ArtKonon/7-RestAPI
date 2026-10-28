@@ -31,7 +31,8 @@ func (h *BookHandler) CreateBook(c *gin.Context) {
 
 	if strings.TrimSpace(book.Title) == "" ||
 		strings.TrimSpace(book.ISBN) == "" ||
-		book.CategoryID <= 0 {
+		len(book.Authors) == 0 && strings.TrimSpace(book.LegacyAuthor()) == "" ||
+		book.CategoryID <= 0 && strings.TrimSpace(book.LegacyCategory()) == "" {
 		writeError(c, http.StatusUnprocessableEntity, "validation_error", "missing required fields")
 		return
 	}
@@ -84,7 +85,15 @@ func (h *BookHandler) ListBooks(c *gin.Context) {
 
 	books := h.bookRepo.List()
 
-	_ = c.Query("category")
+	if filter := strings.TrimSpace(c.Query("category")); filter != "" {
+		filtered := make([]model.Book, 0, len(books))
+		for _, book := range books {
+			if strings.EqualFold(book.Category.Name, filter) || strings.EqualFold(book.LegacyCategory(), filter) {
+				filtered = append(filtered, book)
+			}
+		}
+		books = filtered
+	}
 
 	start := (page - 1) * limit
 	if start > len(books) {
@@ -115,7 +124,8 @@ func (h *BookHandler) UpdateBook(c *gin.Context) {
 
 	if strings.TrimSpace(book.Title) == "" ||
 		strings.TrimSpace(book.ISBN) == "" ||
-		book.CategoryID <= 0 {
+		len(book.Authors) == 0 && strings.TrimSpace(book.LegacyAuthor()) == "" ||
+		book.CategoryID <= 0 && strings.TrimSpace(book.LegacyCategory()) == "" {
 		writeError(c, http.StatusUnprocessableEntity, "validation_error", "missing required fields")
 		return
 	}
