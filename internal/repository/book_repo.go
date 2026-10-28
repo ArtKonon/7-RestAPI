@@ -6,23 +6,23 @@ import (
 	"sync"
 	"time"
 
-	"homework/internal/model"
+	"libratrack/internal/model"
 )
 
-type BookRepository struct {
+type InMemoryBookRepository struct {
 	mutex  sync.RWMutex
 	books  map[int]model.Book
 	nextID int
 }
 
-func NewBookRepository() *BookRepository {
-	return &BookRepository{
+func NewInMemoryBookRepository() *InMemoryBookRepository {
+	return &InMemoryBookRepository{
 		books:  make(map[int]model.Book),
 		nextID: 1,
 	}
 }
 
-func (repo *BookRepository) Create(book model.Book) model.Book {
+func (repo *InMemoryBookRepository) Create(book model.Book) model.Book {
 	repo.mutex.Lock()
 	defer repo.mutex.Unlock()
 
@@ -37,7 +37,7 @@ func (repo *BookRepository) Create(book model.Book) model.Book {
 	return book
 }
 
-func (repo *BookRepository) GetByID(id int) (model.Book, bool) {
+func (repo *InMemoryBookRepository) GetByID(id int) (model.Book, bool) {
 	repo.mutex.RLock()
 	defer repo.mutex.RUnlock()
 
@@ -45,7 +45,7 @@ func (repo *BookRepository) GetByID(id int) (model.Book, bool) {
 	return book, ok
 }
 
-func (repo *BookRepository) List() []model.Book {
+func (repo *InMemoryBookRepository) List() []model.Book {
 	repo.mutex.RLock()
 	defer repo.mutex.RUnlock()
 
@@ -62,7 +62,7 @@ func (repo *BookRepository) List() []model.Book {
 	return out
 }
 
-func (r *BookRepository) Update(id int, newBook model.Book) (model.Book, bool) {
+func (r *InMemoryBookRepository) Update(id int, newBook model.Book) (model.Book, bool) {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 
@@ -79,7 +79,7 @@ func (r *BookRepository) Update(id int, newBook model.Book) (model.Book, bool) {
 	return newBook, true
 }
 
-func (r *BookRepository) Delete(id int) bool {
+func (r *InMemoryBookRepository) Delete(id int) bool {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 

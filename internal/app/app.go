@@ -4,19 +4,23 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 
-	"homework/internal/handler"
-	"homework/internal/middleware"
-	"homework/internal/repository"
+	"libratrack/internal/handler"
+	"libratrack/internal/middleware"
+	"libratrack/internal/repository"
 )
 
 func NewRouter() http.Handler {
+	return NewRouterWithRepo(repository.NewInMemoryBookRepository())
+}
+
+func NewRouterWithRepo(repo repository.BookRepository) http.Handler {
 	router := gin.New()
 	router.Use(middleware.Logger())
 	router.Use(middleware.Recovery())
 	router.Use(middleware.CORS())
 
-	repo := repository.NewBookRepository()
 	bookHandler := handler.NewBookHandler(repo)
 
 	router.GET("/health", func(c *gin.Context) {
@@ -33,4 +37,8 @@ func NewRouter() http.Handler {
 	books.DELETE("/:id", bookHandler.DeleteBook)
 
 	return router
+}
+
+func NewRouterWithDB(db *gorm.DB) http.Handler {
+	return NewRouterWithRepo(repository.NewGormBookRepository(db))
 }

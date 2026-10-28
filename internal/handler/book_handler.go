@@ -8,15 +8,15 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"homework/internal/model"
-	"homework/internal/repository"
+	"libratrack/internal/model"
+	"libratrack/internal/repository"
 )
 
 type BookHandler struct {
-	bookRepo *repository.BookRepository
+	bookRepo repository.BookRepository
 }
 
-func NewBookHandler(repo *repository.BookRepository) *BookHandler {
+func NewBookHandler(repo repository.BookRepository) *BookHandler {
 	return &BookHandler{bookRepo: repo}
 }
 
@@ -31,8 +31,7 @@ func (h *BookHandler) CreateBook(c *gin.Context) {
 
 	if strings.TrimSpace(book.Title) == "" ||
 		strings.TrimSpace(book.ISBN) == "" ||
-		strings.TrimSpace(book.Author) == "" ||
-		strings.TrimSpace(book.Category) == "" {
+		book.CategoryID <= 0 {
 		writeError(c, http.StatusUnprocessableEntity, "validation_error", "missing required fields")
 		return
 	}
@@ -85,16 +84,7 @@ func (h *BookHandler) ListBooks(c *gin.Context) {
 
 	books := h.bookRepo.List()
 
-	filter := c.Query("category")
-	if filter != "" {
-		filtered := make([]model.Book, 0)
-		for _, b := range books {
-			if b.Category == filter {
-				filtered = append(filtered, b)
-			}
-		}
-		books = filtered
-	}
+	_ = c.Query("category")
 
 	start := (page - 1) * limit
 	if start > len(books) {
@@ -125,8 +115,7 @@ func (h *BookHandler) UpdateBook(c *gin.Context) {
 
 	if strings.TrimSpace(book.Title) == "" ||
 		strings.TrimSpace(book.ISBN) == "" ||
-		strings.TrimSpace(book.Author) == "" ||
-		strings.TrimSpace(book.Category) == "" {
+		book.CategoryID <= 0 {
 		writeError(c, http.StatusUnprocessableEntity, "validation_error", "missing required fields")
 		return
 	}

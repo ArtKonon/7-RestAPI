@@ -5,5 +5,8 @@
 test.json
 list.txt
 result.json
+.env
+.env.*
+!.env.example
 .idea/
 .vscode/
