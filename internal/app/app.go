@@ -31,6 +31,7 @@ func NewRouterWithRepo(repo repository.BookRepository) http.Handler {
 	router.GET("/health", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"status": "ok"})
 	})
+	router.Static("/swagger", "./swagger")
 
 	api := router.Group("/api/v1")
 	books := api.Group("/books")
@@ -233,6 +234,30 @@ func registerBookRoutes(api *gin.RouterGroup, db *gorm.DB) {
 		})
 
 		books.GET("", func(c *gin.Context) {
+			page := 1
+			limit := 10
+
+			if q := c.Query("page"); q != "" {
+				p, err := strconv.Atoi(q)
+				if err != nil || p < 1 {
+					writeAPIError(c, http.StatusBadRequest, "invalid_pagination", "invalid pagination")
+					return
+				}
+				page = p
+			}
+
+			if q := c.Query("limit"); q != "" {
+				l, err := strconv.Atoi(q)
+				if err != nil || l < 1 {
+					writeAPIError(c, http.StatusBadRequest, "invalid_pagination", "invalid pagination")
+					return
+				}
+				if l > 100 {
+					l = 100
+				}
+				limit = l
+			}
+
 			var books []model.Book
 			query := db.Preload("Authors").Preload("Category").Order("id")
 			if categoryID := strings.TrimSpace(c.Query("category_id")); categoryID != "" {
@@ -244,8 +269,20 @@ func registerBookRoutes(api *gin.RouterGroup, db *gorm.DB) {
 				writeAPIError(c, http.StatusInternalServerError, "internal_server_error", "internal server error")
 				return
 			}
-			resp := make([]gin.H, 0, len(books))
-			for _, book := range books {
+
+			start := (page - 1) * limit
+			if start >= len(books) {
+				c.JSON(http.StatusOK, []gin.H{})
+				return
+			}
+
+			end := start + limit
+			if end > len(books) {
+				end = len(books)
+			}
+
+			resp := make([]gin.H, 0, end-start)
+			for _, book := range books[start:end] {
 				resp = append(resp, buildBookResponse(book))
 			}
 			c.JSON(http.StatusOK, resp)

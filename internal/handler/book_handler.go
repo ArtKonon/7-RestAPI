@@ -96,7 +96,7 @@ func (h *BookHandler) ListBooks(c *gin.Context) {
 	}
 
 	start := (page - 1) * limit
-	if start > len(books) {
+	if start >= len(books) {
 		c.JSON(http.StatusOK, []model.Book{})
 		return
 	}
