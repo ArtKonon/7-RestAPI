@@ -10,7 +10,10 @@ import (
 )
 
 func NewDB() (*gorm.DB, error) {
-	dsn := os.Getenv("DATABASE_URL")
+	dsn := os.Getenv("TEST_DATABASE_URL")
+	if dsn == "" {
+		dsn = os.Getenv("DATABASE_URL")
+	}
 	if dsn == "" {
 		dsn = "postgres://libratrack:libratrack@localhost:5432/libratrack?sslmode=disable"
 	}

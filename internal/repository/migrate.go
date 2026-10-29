@@ -19,6 +19,12 @@ func RunMigrations(databaseURL, migrationsPath string) error {
 	if databaseURL == "" {
 		databaseURL = os.Getenv("DATABASE_URL")
 	}
+	if databaseURL == "" {
+		return fmt.Errorf("database URL is empty")
+	}
+	if migrationsPath == "" {
+		migrationsPath = os.Getenv("MIGRATIONS_PATH")
+	}
 	if migrationsPath == "" {
 		migrationsPath = "migrations"
 	}

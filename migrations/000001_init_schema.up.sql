@@ -44,6 +44,32 @@ CREATE TABLE IF NOT EXISTS book_authors (
         ON DELETE RESTRICT
 );
 
+CREATE TABLE IF NOT EXISTS copies (
+    id BIGSERIAL PRIMARY KEY,
+    book_id BIGINT NOT NULL,
+    inventory_no VARCHAR(100) NOT NULL UNIQUE,
+    status VARCHAR(32) NOT NULL DEFAULT 'available',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CONSTRAINT fk_copies_book
+        FOREIGN KEY (book_id)
+        REFERENCES books(id)
+        ON DELETE CASCADE,
+    CONSTRAINT chk_copies_status
+        CHECK (status IN ('available', 'lost', 'damaged'))
+);
+
+CREATE TABLE IF NOT EXISTS users (
+    id BIGSERIAL PRIMARY KEY,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    role VARCHAR(32) NOT NULL DEFAULT 'user',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CONSTRAINT chk_users_role
+        CHECK (role IN ('user', 'admin'))
+);
+
 CREATE INDEX IF NOT EXISTS idx_books_category_id ON books (category_id);
 CREATE INDEX IF NOT EXISTS idx_book_authors_book_id ON book_authors (book_id);
 CREATE INDEX IF NOT EXISTS idx_book_authors_author_id ON book_authors (author_id);
+CREATE INDEX IF NOT EXISTS idx_copies_book_id ON copies (book_id);
