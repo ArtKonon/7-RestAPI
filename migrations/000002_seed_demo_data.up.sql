@@ -13,7 +13,8 @@ INSERT INTO authors (full_name, bio) VALUES
     ('J.R.R. Tolkien', 'Fantasy and mythology author.'),
     ('Yuval Noah Harari', 'Historian and author.'),
     ('Jane Austen', 'English novelist.'),
-    ('Frank Herbert', 'Science fiction novelist.')
+    ('Frank Herbert', 'Science fiction novelist.'),
+    ('Ursula K. Le Guin', 'Science fiction and fantasy author.')
 ON CONFLICT DO NOTHING;
 
 INSERT INTO books (title, isbn, category_id, published_year, description)
@@ -53,6 +54,11 @@ ON CONFLICT (isbn) DO NOTHING;
 
 INSERT INTO books (title, isbn, category_id, published_year, description)
 SELECT 'Dune', '9780441172719', c.id, 1965, 'Epic desert planet saga.'
+FROM categories c WHERE c.name = 'Science Fiction'
+ON CONFLICT (isbn) DO NOTHING;
+
+INSERT INTO books (title, isbn, category_id, published_year, description)
+SELECT 'The Left Hand of Darkness', '9780441478125', c.id, 1969, 'A landmark work of speculative fiction.'
 FROM categories c WHERE c.name = 'Science Fiction'
 ON CONFLICT (isbn) DO NOTHING;
 
@@ -117,6 +123,13 @@ SELECT b.id, a.id
 FROM books b
 JOIN authors a ON a.full_name = 'Frank Herbert'
 WHERE b.isbn = '9780441172719'
+ON CONFLICT DO NOTHING;
+
+INSERT INTO book_authors (book_id, author_id)
+SELECT b.id, a.id
+FROM books b
+JOIN authors a ON a.full_name = 'Ursula K. Le Guin'
+WHERE b.isbn = '9780441478125'
 ON CONFLICT DO NOTHING;
 
 INSERT INTO copies (book_id, inventory_no, status)
