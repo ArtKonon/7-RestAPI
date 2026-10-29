@@ -40,8 +40,8 @@ func (b Book) MarshalJSON() ([]byte, error) {
 		ID            int       `json:"id"`
 		Title         string    `json:"title"`
 		ISBN          string    `json:"isbn"`
-		Author        string    `json:"author,omitempty"`
-		Category      string    `json:"category,omitempty"`
+		AuthorName    string    `json:"author,omitempty"`
+		CategoryName  string    `json:"category,omitempty"`
 		PublishedYear *int      `json:"published_year"`
 		Description   *string   `json:"description"`
 		CreatedAt     time.Time `json:"created_at"`
@@ -58,10 +58,10 @@ func (b Book) MarshalJSON() ([]byte, error) {
 		UpdatedAt:     b.UpdatedAt,
 	}
 	if auth := b.LegacyAuthor(); auth != "" {
-		aux.Author = auth
+		aux.AuthorName = auth
 	}
 	if cat := b.LegacyCategory(); cat != "" {
-		aux.Category = cat
+		aux.CategoryName = cat
 	}
 	return json.Marshal(aux)
 }
@@ -71,8 +71,8 @@ func (b *Book) UnmarshalJSON(data []byte) error {
 		ID            int       `json:"id"`
 		Title         string    `json:"title"`
 		ISBN          string    `json:"isbn"`
-		Author        string    `json:"author"`
-		Category      string    `json:"category"`
+		AuthorName    string    `json:"author"`
+		CategoryName  string    `json:"category"`
 		CategoryID    int       `json:"category_id"`
 		AuthorIDs     []int     `json:"author_ids"`
 		PublishedYear *int      `json:"published_year"`
@@ -98,8 +98,8 @@ func (b *Book) UnmarshalJSON(data []byte) error {
 		b.CategoryID = aux.CategoryID
 		b.Category = Category{ID: aux.CategoryID}
 	}
-	if strings.TrimSpace(aux.Category) != "" {
-		b.Category = Category{Name: aux.Category}
+	if strings.TrimSpace(aux.CategoryName) != "" {
+		b.Category = Category{Name: aux.CategoryName}
 		if b.CategoryID == 0 {
 			b.CategoryID = 0
 		}
@@ -110,8 +110,8 @@ func (b *Book) UnmarshalJSON(data []byte) error {
 		for _, id := range aux.AuthorIDs {
 			b.Authors = append(b.Authors, Author{ID: id})
 		}
-	} else if strings.TrimSpace(aux.Author) != "" {
-		b.Authors = []Author{{FullName: aux.Author}}
+	} else if strings.TrimSpace(aux.AuthorName) != "" {
+		b.Authors = []Author{{FullName: aux.AuthorName}}
 	}
 
 	return nil

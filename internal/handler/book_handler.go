@@ -58,7 +58,7 @@ func (h *BookHandler) GetBook(c *gin.Context) {
 }
 
 func (h *BookHandler) ListBooks(c *gin.Context) {
-	// page и limit как в README
+	// page and limit as described in the README
 	page := 1
 	limit := 10
 
