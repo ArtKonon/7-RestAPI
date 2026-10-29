@@ -3,6 +3,8 @@ package app
 import (
 	"errors"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -20,6 +22,19 @@ func NewRouter() http.Handler {
 	return NewRouterWithRepo(repository.NewInMemoryBookRepository())
 }
 
+func mountSwagger(router *gin.Engine) {
+	wd, err := os.Getwd()
+	if err != nil || wd == "" {
+		wd = "."
+	}
+
+	swaggerDir := filepath.Join(wd, "swagger")
+	router.Static("/swagger", swaggerDir)
+	router.GET("/swagger", func(c *gin.Context) {
+		c.Redirect(http.StatusMovedPermanently, "/swagger/index.html")
+	})
+}
+
 func NewRouterWithRepo(repo repository.BookRepository) http.Handler {
 	router := gin.New()
 	router.Use(middleware.Logger())
@@ -31,7 +46,7 @@ func NewRouterWithRepo(repo repository.BookRepository) http.Handler {
 	router.GET("/health", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"status": "ok"})
 	})
-	router.Static("/swagger", "./swagger")
+	mountSwagger(router)
 
 	api := router.Group("/api/v1")
 	books := api.Group("/books")
@@ -53,7 +68,7 @@ func NewRouterWithDB(db *gorm.DB) http.Handler {
 	router.GET("/health", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"status": "ok"})
 	})
-	router.Static("/swagger", "./swagger")
+	mountSwagger(router)
 
 	api := router.Group("/api/v1")
 	registerCategoryRoutes(api, db)
