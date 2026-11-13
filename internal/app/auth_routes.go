@@ -42,8 +42,6 @@ func registerStaffRoutes(api *gin.RouterGroup, db *gorm.DB) {
 
 	staff := api.Group("")
 	staff.Use(middleware.AuthMiddleware(), middleware.RequireRole("librarian", "admin"))
-	staff.POST("/books", createBookRestrictedHandler(db))
-	staff.PUT("/books/:id", updateBookRestrictedHandler(db))
 	staff.POST("/loans", func(c *gin.Context) {
 		c.JSON(http.StatusCreated, gin.H{"status": "loan_created"})
 	})

@@ -3,6 +3,10 @@ package app_test
 import (
 	"net/http"
 	"testing"
+
+	"libratrack/internal/app"
+
+	"gorm.io/gorm"
 )
 
 // Stage 1: skeleton, create and get a single resource.
@@ -109,4 +113,14 @@ func TestStage1_RoutersAreIsolated(t *testing.T) {
 	if r.Code != http.StatusNotFound {
 		t.Errorf("every NewRouter() call must have its own empty storage, but a resource created through another router was visible (status %d)", r.Code)
 	}
+}
+
+func TestNewRouterWithDB_DoesNotDuplicateBookRoutes(t *testing.T) {
+	defer func() {
+		if rec := recover(); rec != nil {
+			t.Fatalf("NewRouterWithDB panicked while registering routes: %v", rec)
+		}
+	}()
+
+	_ = app.NewRouterWithDB(&gorm.DB{})
 }
