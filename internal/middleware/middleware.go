@@ -11,6 +11,8 @@ import (
 )
 
 func Logger() gin.HandlerFunc {
+	// Request bodies are intentionally omitted from log output to avoid leaking
+	// sensitive fields such as password during login or registration.
 	return gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
 		return fmt.Sprintf("%s - [%s] \"%s %s %s %d %s \"%s\" %s\n",
 			param.ClientIP,

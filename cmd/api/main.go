@@ -18,6 +18,9 @@ func main() {
 	if err := repository.RunMigrations(os.Getenv("DATABASE_URL"), "migrations"); err != nil {
 		log.Fatalf("run migrations: %v", err)
 	}
+	if os.Getenv("JWT_SECRET") == "" {
+		log.Println("JWT_SECRET is empty; set it before starting the server")
+	}
 
 	addr := ":8080"
 	port := os.Getenv("PORT")

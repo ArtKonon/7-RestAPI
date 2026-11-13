@@ -71,6 +71,10 @@ func NewRouterWithDB(db *gorm.DB) http.Handler {
 	mountSwagger(router)
 
 	api := router.Group("/api/v1")
+	registerAuthRoutes(api, db)
+	registerProtectedRoutes(api, db)
+	registerStaffRoutes(api, db)
+	registerAdminRoutes(api, db)
 	registerCategoryRoutes(api, db)
 	registerAuthorRoutes(api, db)
 	registerBookRoutes(api, db)

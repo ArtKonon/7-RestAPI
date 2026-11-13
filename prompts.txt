@@ -1,0 +1,7 @@
+Prompt 2.1: Authentication Module (bcrypt + JWT)
+
+Create a Go package at internal/auth with functions to hash and verify passwords using bcrypt.GenerateFromPassword and bcrypt.CompareHashAndPassword. Add a JWT helper that signs claims with jwt.SigningMethodHS256 and reads the secret strictly from os.Getenv("JWT_SECRET"). Include claims for user_id, role, and exp set to 24 hours. Also add a DB migration 000003_add_auth_fields.up.sql and 000003_add_auth_fields.down.sql that adds password_hash and role to the users table. Update the User model to include PasswordHash with json:"-" and default role as reader. Add Register and Login handlers that return generic 401 invalid credentials responses for both unknown emails and mismatched passwords.
+
+Prompt 2.2: Middleware Chain (AuthMiddleware + RequireRole)
+
+Create internal/middleware/auth.go and internal/middleware/rbac.go with Gin middleware. AuthMiddleware should read Authorization: Bearer <token>, validate signature and exp, and set user_id and role in Gin context. RequireRole must be variadic, accept allowed roles, and return 401 on missing/invalid auth or 403 if role is not authorized. Register route groups in main.go or app setup using public, protected, staff, and admin groups. Ensure AuthMiddleware runs before RequireRole, and use nested route groups so public routes stay unauthenticated while protected/staff/admin routes enforce access control.

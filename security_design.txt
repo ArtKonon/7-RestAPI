@@ -1,0 +1,42 @@
+LibraTrack Security Design
+
+Roles
+- reader: basic user; can view library catalog and access own loans.
+- librarian: can create and update books, create/return loans.
+- admin: full administrative access; can read all users and change user roles.
+
+Access Matrix
+Public routes
+- POST /api/v1/auth/register
+- POST /api/v1/auth/login
+- GET /api/v1/books
+- GET /api/v1/books/:id
+
+Protected routes (any authenticated user)
+- GET /api/v1/me/loans
+
+Staff routes (librarian or admin)
+- POST /api/v1/books
+- PUT /api/v1/books/:id
+- POST /api/v1/loans
+- POST /api/v1/loans/:id/return
+
+Admin routes
+- GET /api/v1/users
+- PUT /api/v1/users/:id/role
+
+DTO and mass-assignment controls
+- RegisterRequest only allows email and password.
+- UpdateProfileRequest only allows editable user fields.
+- PasswordHash is tagged with json:"-" so it is never serialized to clients.
+
+Authentication and authorization rules
+- Use bcrypt to hash passwords before storing them.
+- Issue JWTs signed with HS256 using the secret loaded from JWT_SECRET.
+- Validate Authorization: Bearer <token> in AuthMiddleware.
+- Store user_id and role in Gin context for RBAC checks.
+- Abort explicitly with c.AbortWithStatusJSON() on every auth or authorization failure.
+
+Logging guidance
+- Request logging should never print raw request bodies containing password values.
+- In practice, Gin logger avoids serializing bodies; password data should be omitted from any structured logs.

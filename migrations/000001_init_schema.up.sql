@@ -73,3 +73,41 @@ CREATE INDEX IF NOT EXISTS idx_books_category_id ON books (category_id);
 CREATE INDEX IF NOT EXISTS idx_book_authors_book_id ON book_authors (book_id);
 CREATE INDEX IF NOT EXISTS idx_book_authors_author_id ON book_authors (author_id);
 CREATE INDEX IF NOT EXISTS idx_copies_book_id ON copies (book_id);
+
+CREATE OR REPLACE FUNCTION set_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = NOW();
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_categories_updated_at ON categories;
+CREATE TRIGGER trg_categories_updated_at
+BEFORE UPDATE ON categories
+FOR EACH ROW
+EXECUTE FUNCTION set_updated_at();
+
+DROP TRIGGER IF EXISTS trg_authors_updated_at ON authors;
+CREATE TRIGGER trg_authors_updated_at
+BEFORE UPDATE ON authors
+FOR EACH ROW
+EXECUTE FUNCTION set_updated_at();
+
+DROP TRIGGER IF EXISTS trg_book_authors_updated_at ON book_authors;
+CREATE TRIGGER trg_book_authors_updated_at
+BEFORE UPDATE ON book_authors
+FOR EACH ROW
+EXECUTE FUNCTION set_updated_at();
+
+DROP TRIGGER IF EXISTS trg_copies_updated_at ON copies;
+CREATE TRIGGER trg_copies_updated_at
+BEFORE UPDATE ON copies
+FOR EACH ROW
+EXECUTE FUNCTION set_updated_at();
+
+DROP TRIGGER IF EXISTS trg_users_updated_at ON users;
+CREATE TRIGGER trg_users_updated_at
+BEFORE UPDATE ON users
+FOR EACH ROW
+EXECUTE FUNCTION set_updated_at();
