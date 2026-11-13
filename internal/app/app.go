@@ -23,15 +23,53 @@ func NewRouter() http.Handler {
 }
 
 func mountSwagger(router *gin.Engine) {
-	wd, err := os.Getwd()
-	if err != nil || wd == "" {
-		wd = "."
+	cwd, err := os.Getwd()
+	if err != nil || cwd == "" {
+		cwd = "."
 	}
 
-	swaggerDir := filepath.Join(wd, "swagger")
-	router.Static("/swagger", swaggerDir)
+	candidateDirs := []string{
+		filepath.Join(cwd, "swagger"),
+		filepath.Join(cwd, "..", "swagger"),
+		filepath.Join(cwd, "..", "..", "swagger"),
+	}
+
+	if exePath, err := os.Executable(); err == nil {
+		candidateDirs = append(candidateDirs,
+			filepath.Join(filepath.Dir(exePath), "swagger"),
+			filepath.Join(filepath.Dir(exePath), "..", "swagger"),
+		)
+	}
+
+	swaggerDir := ""
+	for _, candidate := range candidateDirs {
+		if info, statErr := os.Stat(candidate); statErr == nil && info.IsDir() {
+			swaggerDir = candidate
+			break
+		}
+	}
+	if swaggerDir == "" {
+		swaggerDir = filepath.Join(cwd, "swagger")
+	}
+
 	router.GET("/swagger", func(c *gin.Context) {
 		c.Redirect(http.StatusMovedPermanently, "/swagger/index.html")
+	})
+	router.GET("/swagger/", func(c *gin.Context) {
+		data, err := os.ReadFile(filepath.Join(swaggerDir, "index.html"))
+		if err != nil {
+			c.AbortWithStatus(http.StatusNotFound)
+			return
+		}
+		c.Data(http.StatusOK, "text/html; charset=utf-8", data)
+	})
+	router.GET("/swagger/index.html", func(c *gin.Context) {
+		data, err := os.ReadFile(filepath.Join(swaggerDir, "index.html"))
+		if err != nil {
+			c.AbortWithStatus(http.StatusNotFound)
+			return
+		}
+		c.Data(http.StatusOK, "text/html; charset=utf-8", data)
 	})
 }
 
