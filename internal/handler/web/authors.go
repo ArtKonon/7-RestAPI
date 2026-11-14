@@ -76,7 +76,10 @@ func (h *Handler) UpdateAuthor(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "invalid form data", http.StatusBadRequest)
 		return
 	}
-	oldName := strings.TrimSpace(parseAuthorNameFromPath(r.URL.Path, ""))
+	oldName := strings.TrimSpace(r.FormValue("old_name"))
+	if oldName == "" {
+		oldName = strings.TrimSpace(parseAuthorNameFromPath(r.URL.Path, ""))
+	}
 	newName := strings.TrimSpace(r.FormValue("name"))
 	bio := strings.TrimSpace(r.FormValue("bio"))
 	if oldName == "" || newName == "" {
@@ -88,7 +91,7 @@ func (h *Handler) UpdateAuthor(w http.ResponseWriter, r *http.Request) {
 	for _, book := range books {
 		changed := false
 		for i, author := range book.Authors {
-			if strings.TrimSpace(author.FullName) != oldName {
+			if !strings.EqualFold(strings.TrimSpace(author.FullName), oldName) {
 				continue
 			}
 			author.FullName = newName
@@ -158,10 +161,15 @@ func collectAuthorCards(books []model.Book) []pages.AuthorCard {
 			}
 			if _, exists := byAuthor[name]; !exists {
 				order = append(order, name)
-				byAuthor[name] = pages.AuthorCard{Name: name, Bio: authorBio(author), Books: nil}
+				byAuthor[name] = pages.AuthorCard{Name: name, Books: nil}
 			}
 			card := byAuthor[name]
 			card.Books = append(card.Books, pages.AuthorBook{ID: book.ID, Title: book.Title, URL: "/books/" + strconv.Itoa(book.ID) + "/edit"})
+			if author.Bio != nil {
+				if bio := strings.TrimSpace(*author.Bio); bio != "" {
+					card.Bio = bio
+				}
+			}
 			if strings.TrimSpace(card.Bio) == "" {
 				card.Bio = authorBio(author)
 			}

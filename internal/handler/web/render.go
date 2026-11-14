@@ -53,7 +53,11 @@ func (h *Handler) Clock(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) LoginPage(w http.ResponseWriter, r *http.Request) {
 	profile := readProfileCookie(r)
-	h.renderPage(w, r, pages.LoginPage(profile.Name, profile.Email, profile.Feedback), pages.LoginContent(profile.Name, profile.Email, profile.Feedback), http.StatusOK)
+	h.renderPage(w, r,
+		pages.LoginPage(profile.Name, profile.Email, profile.Feedback, profile.Name, profile.Email, profile.Feedback),
+		pages.LoginContent(profile.Name, profile.Email, profile.Feedback, profile.Name, profile.Email, profile.Feedback),
+		http.StatusOK,
+	)
 }
 
 func (h *Handler) SaveProfile(w http.ResponseWriter, r *http.Request) {
@@ -67,7 +71,11 @@ func (h *Handler) SaveProfile(w http.ResponseWriter, r *http.Request) {
 		Feedback: strings.TrimSpace(r.FormValue("feedback")),
 	}
 	saveProfileCookie(w, profile)
-	h.renderPage(w, r, pages.LoginPage(profile.Name, profile.Email, profile.Feedback), pages.LoginContent(profile.Name, profile.Email, profile.Feedback), http.StatusOK)
+	h.renderPage(w, r,
+		pages.LoginPage("", "", "", profile.Name, profile.Email, profile.Feedback),
+		pages.LoginContent("", "", "", profile.Name, profile.Email, profile.Feedback),
+		http.StatusOK,
+	)
 }
 
 func saveProfileCookie(w http.ResponseWriter, profile Profile) {

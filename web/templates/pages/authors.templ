@@ -31,7 +31,6 @@ templ AuthorsContent(authors []AuthorCard, userName string, query string, alert 
 				<h1>Authors</h1>
 				<p>Short biographies and the books connected to each writer.</p>
 			</div>
-			<a class="button primary" href="/authors/new">Create author</a>
 		</header>
 
 		<div class="toolbar">
@@ -41,10 +40,6 @@ templ AuthorsContent(authors []AuthorCard, userName string, query string, alert 
 				<button class="button secondary" type="submit">Apply</button>
 			</form>
 		</div>
-
-		if alert != "" {
-			<div class="alert error">{ alert }</div>
-		}
 
 		if len(authors) == 0 {
 			@partials.EmptyState("No authors match the current search.")
@@ -68,21 +63,18 @@ templ AuthorsContent(authors []AuthorCard, userName string, query string, alert 
 									for _, book := range author.Books {
 										<li>
 											<span>{ book.Title }</span>
-											<a class="button small secondary" href={ book.URL }>Edit</a>
 										</li>
 									}
 								</ul>
 							</td>
 							<td class="actions">
-								<a class="button small secondary" href={ "/authors/" + url.PathEscape(author.Name) + "/edit" }>Edit author</a>
-								if len(author.Books) == 0 {
-									<form method="post" action={ "/authors/" + url.PathEscape(author.Name) + "/delete" }>
-										<button class="button small danger" type="submit">Delete</button>
-									</form>
-								} else {
-									<span class="warning-text">This author is published.</span>
-								}
-							</td>
+									<a class="button small secondary" href={ "/authors/" + url.PathEscape(author.Name) + "/edit" }>Edit</a>
+									if len(author.Books) == 0 {
+										<form method="post" action={ "/authors/" + url.PathEscape(author.Name) + "/delete" }>
+											<button class="button small danger" type="submit">Delete</button>
+										</form>
+									}
+								</td>
 						</tr>
 					}
 				</tbody>
@@ -123,6 +115,13 @@ templ AuthorFormContent(form AuthorForm, title string) {
 			</div>
 			<div class="field field-block">
 				<label for="bio">Bio</label>
+				<div class="bio-presets">
+					<button type="button" class="button small secondary" onclick="document.getElementById('bio').value='An author whose work blends sharp observation with unforgettable atmosphere and a voice readers return to.'">Classic storyteller</button>
+					<button type="button" class="button small secondary" onclick="document.getElementById('bio').value='A thoughtful writer exploring memory, identity, and the hidden details that shape everyday life.'">Thoughtful observer</button>
+					<button type="button" class="button small secondary" onclick="document.getElementById('bio').value='A contemporary author known for precise prose, strong characters, and emotionally layered narratives.'">Contemporary voice</button>
+					<button type="button" class="button small secondary" onclick="document.getElementById('bio').value='An award-winning writer whose books connect emotion, place, and social insight in equal measure.'">Award-winning author</button>
+					<button type="button" class="button small secondary" onclick="document.getElementById('bio').value='A literary creator with a talent for transforming everyday moments into compelling, memorable reading.'">Literary creator</button>
+				</div>
 				<textarea id="bio" name="bio" rows="6">{ form.Bio }</textarea>
 			</div>
 			<div class="form-actions left">
@@ -151,6 +150,7 @@ templ AuthorEditContent(author AuthorCard, userName string) {
 		</header>
 
 		<form class="book-form" method="post" action={ "/authors/" + url.PathEscape(author.Name) }>
+			<input type="hidden" name="old_name" value={ author.Name } />
 			<div class="field-group">
 				<div class="field">
 					<label for="name">Name</label>
@@ -159,6 +159,13 @@ templ AuthorEditContent(author AuthorCard, userName string) {
 			</div>
 			<div class="field field-block">
 				<label for="bio">Bio</label>
+				<div class="bio-presets">
+					<button type="button" class="button small secondary" onclick="document.getElementById('bio').value='An author whose work blends sharp observation with unforgettable atmosphere and a voice readers return to.'">Classic storyteller</button>
+					<button type="button" class="button small secondary" onclick="document.getElementById('bio').value='A thoughtful writer exploring memory, identity, and the hidden details that shape everyday life.'">Thoughtful observer</button>
+					<button type="button" class="button small secondary" onclick="document.getElementById('bio').value='A contemporary author known for precise prose, strong characters, and emotionally layered narratives.'">Contemporary voice</button>
+					<button type="button" class="button small secondary" onclick="document.getElementById('bio').value='An award-winning writer whose books connect emotion, place, and social insight in equal measure.'">Award-winning author</button>
+					<button type="button" class="button small secondary" onclick="document.getElementById('bio').value='A literary creator with a talent for transforming everyday moments into compelling, memorable reading.'">Literary creator</button>
+				</div>
 				<textarea id="bio" name="bio" rows="6">{ author.Bio }</textarea>
 			</div>
 			<div class="form-actions left">

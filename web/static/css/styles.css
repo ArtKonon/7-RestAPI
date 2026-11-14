@@ -177,6 +177,13 @@ code {
   font-weight: 600;
 }
 
+.bio-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
 .empty-state,
 .alert {
   border-radius: 12px;

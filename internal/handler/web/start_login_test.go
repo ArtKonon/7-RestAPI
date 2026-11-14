@@ -100,6 +100,9 @@ func TestSaveProfileRendersSummaryImmediately(t *testing.T) {
 	if !strings.Contains(body, "Saved profile: Jane Doe · jane@example.com") {
 		t.Fatalf("expected inline profile summary after save, got: %s", body)
 	}
+	if strings.Contains(body, "value=\"Jane Doe\"") || strings.Contains(body, "value=\"jane@example.com\"") {
+		t.Fatalf("expected form values to clear after save, got: %s", body)
+	}
 }
 
 func TestUpdateAuthorPropagatesToBooks(t *testing.T) {
@@ -115,7 +118,7 @@ func TestUpdateAuthorPropagatesToBooks(t *testing.T) {
 
 	h := NewHandler(repo)
 	res := httptest.NewRecorder()
-	req := httptest.NewRequest(http.MethodPost, "/authors/Arthur+Conan+Doyle", strings.NewReader("name=Sir+Arthur+Conan+Doyle&bio=Updated+bio."))
+	req := httptest.NewRequest(http.MethodPost, "/authors/Arthur+Conan+Doyle", strings.NewReader("old_name=Arthur+Conan+Doyle&name=Sir+Arthur+Conan+Doyle&bio=Updated+bio."))
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.URL.RawPath = "/authors/Arthur+Conan+Doyle"
 
@@ -133,4 +136,39 @@ func TestUpdateAuthorPropagatesToBooks(t *testing.T) {
 	if updated.Authors[0].Bio == nil || *updated.Authors[0].Bio != "Updated bio." {
 		t.Fatalf("expected author bio updated in book, got %#v", updated.Authors[0].Bio)
 	}
+}
+
+func TestAuthorsPageDoesNotExposeCreateActionsOrPublishedWarning(t *testing.T) {
+	repo := repository.NewInMemoryBookRepository()
+	book := model.Book{
+		Title:    "The Hound of the Baskervilles",
+		ISBN:     "978-1-2345-6789-0",
+		Category: model.Category{Name: "Classics"},
+		Authors:  []model.Author{{FullName: "Arthur Conan Doyle", Bio: stringPtr("A classic author.")}},
+	}
+	repo.Create(book)
+
+	h := NewHandler(repo)
+	res := httptest.NewRecorder()
+	req := httptest.NewRequest(http.MethodGet, "/authors", nil)
+	res = httptest.NewRecorder()
+	if err := req.ParseForm(); err != nil {
+		t.Fatal(err)
+	}
+
+	h.AuthorsPage(res, req)
+	body := res.Body.String()
+	if strings.Contains(body, "Create author") {
+		t.Fatalf("authors page should not expose create author action, got: %s", body)
+	}
+	if strings.Contains(body, "This author is published.") {
+		t.Fatalf("authors page should not expose published warning, got: %s", body)
+	}
+	if strings.Contains(body, "/books/") && strings.Contains(body, "Edit") {
+		t.Fatalf("authors page should not expose book edit links, got: %s", body)
+	}
+}
+
+func stringPtr(s string) *string {
+	return &s
 }

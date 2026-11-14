@@ -5,11 +5,11 @@ import (
 	"libratrack/web/templates/partials"
 )
 
-templ LoginPage(name string, email string, feedback string) {
-	@layout.Base("Login", LoginContent(name, email, feedback))
+templ LoginPage(name string, email string, feedback string, savedName string, savedEmail string, savedFeedback string) {
+	@layout.Base("Login", LoginContent(name, email, feedback, savedName, savedEmail, savedFeedback))
 }
 
-templ LoginContent(name string, email string, feedback string) {
+templ LoginContent(name string, email string, feedback string, savedName string, savedEmail string, savedFeedback string) {
 	<main class="container">
 		@partials.MainNav("login")
 		<header class="page-header">
@@ -18,15 +18,15 @@ templ LoginContent(name string, email string, feedback string) {
 			<p class="muted-text">Enter your name and email to keep your profile and leave a quick note for the team.</p>
 		</header>
 
-		<form class="book-form" method="post" action="/login">
+		<form class="book-form" method="post" action="/login" novalidate onsubmit="return validateLoginForm(this);">
 			<div class="field-group">
 				<div class="field">
 					<label for="name">Name</label>
-					<input id="name" name="name" type="text" value={ name } placeholder="Your name" required />
+					<input id="name" name="name" type="text" value={ name } placeholder="Your name" oninvalid="this.setCustomValidity('Please fill out this field.')" oninput="this.setCustomValidity('')" />
 				</div>
 				<div class="field">
 					<label for="email">Email</label>
-					<input id="email" name="email" type="email" value={ email } placeholder="you@example.com" required />
+					<input id="email" name="email" type="email" value={ email } placeholder="you@example.com" oninvalid="this.setCustomValidity(this.value.trim() ? 'Please enter a valid email address.' : 'Please fill out this field.')" oninput="this.setCustomValidity('')" />
 				</div>
 			</div>
 			<div class="field field-block">
@@ -37,9 +37,39 @@ templ LoginContent(name string, email string, feedback string) {
 				<button class="button primary" type="submit">Save profile</button>
 			</div>
 		</form>
+		<script>
+			function validateLoginForm(form) {
+				const nameField = form.querySelector('#name');
+				const emailField = form.querySelector('#email');
+				const nameValue = nameField.value.trim();
+				const emailValue = emailField.value.trim();
 
-		if name != "" || email != "" || feedback != "" {
-			<p class="welcome-text">Saved profile: { name } · { email }</p>
+				if (!nameValue) {
+					nameField.setCustomValidity('Please fill out this field.');
+					nameField.reportValidity();
+					return false;
+				}
+				nameField.setCustomValidity('');
+
+				if (!emailValue) {
+					emailField.setCustomValidity('Please fill out this field.');
+					emailField.reportValidity();
+					return false;
+				}
+
+				const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue) || /^[^\s@]+@[^\s@]+$/.test(emailValue);
+				emailField.setCustomValidity(validEmail ? '' : 'Please enter a valid email address.');
+				if (!validEmail) {
+					emailField.reportValidity();
+					return false;
+				}
+
+				return true;
+			}
+		</script>
+
+		if savedName != "" || savedEmail != "" || savedFeedback != "" {
+			<p class="welcome-text">Saved profile: { savedName } · { savedEmail }</p>
 		}
 	</main>
 }

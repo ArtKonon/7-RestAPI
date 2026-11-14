@@ -129,6 +129,17 @@ func (r *gormBookRepository) ensureCategory(ctx context.Context, name string) (m
 	return category, nil
 }
 
+func normalizeAuthorBio(value *string) *string {
+	if value == nil {
+		return nil
+	}
+	trimmed := strings.TrimSpace(*value)
+	if trimmed == "" {
+		return nil
+	}
+	return &trimmed
+}
+
 func (r *gormBookRepository) ensureAuthors(ctx context.Context, authors []model.Author) ([]model.Author, error) {
 	if len(authors) == 0 {
 		return nil, nil
@@ -139,18 +150,48 @@ func (r *gormBookRepository) ensureAuthors(ctx context.Context, authors []model.
 		if name == "" {
 			continue
 		}
+
+		incomingBio := normalizeAuthorBio(author.Bio)
 		var existing model.Author
 		if err := r.db.WithContext(ctx).Where("full_name = ?", name).First(&existing).Error; err == nil {
+			updatedBio := normalizeAuthorBio(existing.Bio)
+			if incomingBio != nil {
+				updatedBio = incomingBio
+			} else if existing.Bio != nil {
+				updatedBio = nil
+			}
+			if existing.FullName != name || !authorBioEqual(existing.Bio, updatedBio) {
+				existing.FullName = name
+				existing.Bio = updatedBio
+				if err := r.db.WithContext(ctx).Model(&existing).Updates(map[string]interface{}{
+					"full_name": existing.FullName,
+					"bio":       existing.Bio,
+				}).Error; err != nil {
+					return nil, err
+				}
+			}
 			result = append(result, existing)
 			continue
 		}
+
 		existing.FullName = name
+		existing.Bio = incomingBio
 		if err := r.db.WithContext(ctx).Create(&existing).Error; err != nil {
 			return nil, err
 		}
 		result = append(result, existing)
 	}
 	return result, nil
+}
+
+func authorBioEqual(current *string, next *string) bool {
+	if current == nil && next == nil {
+		return true
+	}
+	if current == nil || next == nil {
+		return false
+	}
+	return strings.TrimSpace(*current) == strings.TrimSpace(*next)
 }
 
 func (r *gormBookRepository) Delete(id int) bool {
