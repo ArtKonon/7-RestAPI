@@ -37,8 +37,12 @@ func TestLoginPageSavesProfileAndFeedback(t *testing.T) {
 	ssr.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
 	h.SaveProfile(res, ssr)
-	if res.Code != http.StatusSeeOther {
-		t.Fatalf("expected redirect 303, got %d", res.Code)
+	if res.Code != http.StatusOK {
+		t.Fatalf("expected status 200, got %d", res.Code)
+	}
+	body := res.Body.String()
+	if !strings.Contains(body, "Jane Doe") || !strings.Contains(body, "jane@example.com") {
+		t.Fatalf("expected saved profile summary to render immediately, got %s", body)
 	}
 
 	req := httptest.NewRequest(http.MethodGet, "/login", nil)
@@ -79,5 +83,54 @@ func TestAuthorsPageUsesStoredBioAndSearch(t *testing.T) {
 	}
 	if !strings.Contains(body, "value=\"conan\"") {
 		t.Fatalf("expected authors search query preserved in form, got %s", body)
+	}
+}
+
+func TestSaveProfileRendersSummaryImmediately(t *testing.T) {
+	h := NewHandler(repository.NewInMemoryBookRepository())
+	res := httptest.NewRecorder()
+	req := httptest.NewRequest(http.MethodPost, "/login", strings.NewReader("name=Jane+Doe&email=jane%40example.com&feedback=Need+more+classics"))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	h.SaveProfile(res, req)
+	if res.Code != http.StatusOK {
+		t.Fatalf("expected status 200, got %d", res.Code)
+	}
+	body := res.Body.String()
+	if !strings.Contains(body, "Saved profile: Jane Doe · jane@example.com") {
+		t.Fatalf("expected inline profile summary after save, got: %s", body)
+	}
+}
+
+func TestUpdateAuthorPropagatesToBooks(t *testing.T) {
+	repo := repository.NewInMemoryBookRepository()
+	bio := "Original bio."
+	book := model.Book{
+		Title:    "The Hound of the Baskervilles",
+		ISBN:     "978-1-2345-6789-0",
+		Category: model.Category{Name: "Classics"},
+		Authors:  []model.Author{{FullName: "Arthur Conan Doyle", Bio: &bio}},
+	}
+	repo.Create(book)
+
+	h := NewHandler(repo)
+	res := httptest.NewRecorder()
+	req := httptest.NewRequest(http.MethodPost, "/authors/Arthur+Conan+Doyle", strings.NewReader("name=Sir+Arthur+Conan+Doyle&bio=Updated+bio."))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.URL.RawPath = "/authors/Arthur+Conan+Doyle"
+
+	h.UpdateAuthor(res, req)
+	if res.Code != http.StatusSeeOther {
+		t.Fatalf("expected redirect 303, got %d", res.Code)
+	}
+	updated, ok := repo.GetByID(1)
+	if !ok {
+		t.Fatal("expected book to exist")
+	}
+	if len(updated.Authors) != 1 || updated.Authors[0].FullName != "Sir Arthur Conan Doyle" {
+		t.Fatalf("expected author name updated in book, got %#v", updated.Authors)
+	}
+	if updated.Authors[0].Bio == nil || *updated.Authors[0].Bio != "Updated bio." {
+		t.Fatalf("expected author bio updated in book, got %#v", updated.Authors[0].Bio)
 	}
 }

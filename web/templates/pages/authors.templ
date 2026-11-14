@@ -1,21 +1,29 @@
 package pages
 
 import (
+	"net/url"
+
 	layout "libratrack/web/templates"
 	"libratrack/web/templates/partials"
 )
 
+type AuthorBook struct {
+	ID    int
+	Title string
+	URL   string
+}
+
 type AuthorCard struct {
 	Name  string
 	Bio   string
-	Books []string
+	Books []AuthorBook
 }
 
-templ AuthorsPage(authors []AuthorCard, userName string, query string) {
-	@layout.Base("Authors", AuthorsContent(authors, userName, query))
+templ AuthorsPage(authors []AuthorCard, userName string, query string, alert string) {
+	@layout.Base("Authors", AuthorsContent(authors, userName, query, alert))
 }
 
-templ AuthorsContent(authors []AuthorCard, userName string, query string) {
+templ AuthorsContent(authors []AuthorCard, userName string, query string, alert string) {
 	<main class="container">
 		@partials.MainNav("authors")
 		<header class="topbar">
@@ -23,6 +31,7 @@ templ AuthorsContent(authors []AuthorCard, userName string, query string) {
 				<h1>Authors</h1>
 				<p>Short biographies and the books connected to each writer.</p>
 			</div>
+			<a class="button primary" href="/authors/new">Create author</a>
 		</header>
 
 		<div class="toolbar">
@@ -33,6 +42,10 @@ templ AuthorsContent(authors []AuthorCard, userName string, query string) {
 			</form>
 		</div>
 
+		if alert != "" {
+			<div class="alert error">{ alert }</div>
+		}
+
 		if len(authors) == 0 {
 			@partials.EmptyState("No authors match the current search.")
 		} else {
@@ -42,6 +55,7 @@ templ AuthorsContent(authors []AuthorCard, userName string, query string) {
 						<th>Author</th>
 						<th>Bio</th>
 						<th>Books</th>
+						<th>Actions</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -51,16 +65,107 @@ templ AuthorsContent(authors []AuthorCard, userName string, query string) {
 							<td>{ author.Bio }</td>
 							<td>
 								<ul class="book-list">
-									for _, title := range author.Books {
-										<li>{ title }</li>
+									for _, book := range author.Books {
+										<li>
+											<span>{ book.Title }</span>
+											<a class="button small secondary" href={ book.URL }>Edit</a>
+										</li>
 									}
 								</ul>
+							</td>
+							<td class="actions">
+								<a class="button small secondary" href={ "/authors/" + url.PathEscape(author.Name) + "/edit" }>Edit author</a>
+								if len(author.Books) == 0 {
+									<form method="post" action={ "/authors/" + url.PathEscape(author.Name) + "/delete" }>
+										<button class="button small danger" type="submit">Delete</button>
+									</form>
+								} else {
+									<span class="warning-text">This author is published.</span>
+								}
 							</td>
 						</tr>
 					}
 				</tbody>
 			</table>
 		}
+		if userName != "" {
+			<p class="welcome-text">Signed in as { userName }.</p>
+		}
+	</main>
+}
+
+templ AuthorFormPage(form AuthorForm, title string) {
+	@layout.Base(title, AuthorFormContent(form, title))
+}
+
+type AuthorForm struct {
+	Name     string
+	Bio      string
+	UserName string
+}
+
+templ AuthorFormContent(form AuthorForm, title string) {
+	<main class="container">
+		@partials.MainNav("authors")
+		<header class="topbar">
+			<div>
+				<h1>{ title }</h1>
+			</div>
+			<a class="button secondary" href="/authors">Back to authors</a>
+		</header>
+
+		<form class="book-form" method="post" action="/authors">
+			<div class="field-group">
+				<div class="field">
+					<label for="name">Name</label>
+					<input id="name" name="name" type="text" value={ form.Name } required />
+				</div>
+			</div>
+			<div class="field field-block">
+				<label for="bio">Bio</label>
+				<textarea id="bio" name="bio" rows="6">{ form.Bio }</textarea>
+			</div>
+			<div class="form-actions left">
+				<a class="button secondary" href="/authors">Cancel</a>
+				<button class="button primary" type="submit">Create author</button>
+			</div>
+		</form>
+		if form.UserName != "" {
+			<p class="welcome-text">Signed in as { form.UserName }.</p>
+		}
+	</main>
+}
+
+templ AuthorEditPage(author AuthorCard, userName string) {
+	@layout.Base("Edit author", AuthorEditContent(author, userName))
+}
+
+templ AuthorEditContent(author AuthorCard, userName string) {
+	<main class="container">
+		@partials.MainNav("authors")
+		<header class="topbar">
+			<div>
+				<h1>Edit author</h1>
+			</div>
+			<a class="button secondary" href="/authors">Back to authors</a>
+		</header>
+
+		<form class="book-form" method="post" action={ "/authors/" + url.PathEscape(author.Name) }>
+			<div class="field-group">
+				<div class="field">
+					<label for="name">Name</label>
+					<input id="name" name="name" type="text" value={ author.Name } required />
+				</div>
+			</div>
+			<div class="field field-block">
+				<label for="bio">Bio</label>
+				<textarea id="bio" name="bio" rows="6">{ author.Bio }</textarea>
+			</div>
+			<div class="form-actions left">
+				<a class="button secondary" href="/authors">Cancel</a>
+				<button class="button primary" type="submit">Save changes</button>
+			</div>
+		</form>
 		if userName != "" {
 			<p class="welcome-text">Signed in as { userName }.</p>
 		}

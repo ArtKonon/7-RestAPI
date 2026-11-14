@@ -169,6 +169,12 @@ code {
   display: flex;
   gap: 8px;
   align-items: center;
+  flex-wrap: wrap;
+}
+
+.warning-text {
+  color: var(--muted);
+  font-weight: 600;
 }
 
 .empty-state,

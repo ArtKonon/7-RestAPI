@@ -67,7 +67,7 @@ func (h *Handler) SaveProfile(w http.ResponseWriter, r *http.Request) {
 		Feedback: strings.TrimSpace(r.FormValue("feedback")),
 	}
 	saveProfileCookie(w, profile)
-	http.Redirect(w, r, "/login", http.StatusSeeOther)
+	h.renderPage(w, r, pages.LoginPage(profile.Name, profile.Email, profile.Feedback), pages.LoginContent(profile.Name, profile.Email, profile.Feedback), http.StatusOK)
 }
 
 func saveProfileCookie(w http.ResponseWriter, profile Profile) {
