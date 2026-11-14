@@ -1,0 +1,66 @@
+package pages
+
+import (
+	layout "libratrack/web/templates"
+	"libratrack/web/templates/partials"
+)
+
+type AuthorCard struct {
+	Name  string
+	Bio   string
+	Books []string
+}
+
+templ AuthorsPage(authors []AuthorCard, userName string, query string) {
+	@layout.Base("Authors", AuthorsContent(authors, userName, query))
+}
+
+templ AuthorsContent(authors []AuthorCard, userName string, query string) {
+	<main class="container">
+		@partials.MainNav("authors")
+		<header class="topbar">
+			<div>
+				<h1>Authors</h1>
+				<p>Short biographies and the books connected to each writer.</p>
+			</div>
+		</header>
+
+		<form class="search-form" method="get" action="/authors">
+			<label for="q">Search</label>
+			<input id="q" name="q" type="text" value={ query } placeholder="Search by author, title or bio" />
+			<button class="button secondary" type="submit">Apply</button>
+		</form>
+
+		if len(authors) == 0 {
+			@partials.EmptyState("No authors match the current search.")
+		} else {
+			<table class="book-table">
+				<thead>
+					<tr>
+						<th>Author</th>
+						<th>Bio</th>
+						<th>Books</th>
+					</tr>
+				</thead>
+				<tbody>
+					for _, author := range authors {
+						<tr>
+							<td>{ author.Name }</td>
+							<td>{ author.Bio }</td>
+							<td>
+								<ul class="book-list">
+									for _, title := range author.Books {
+										<li>{ title }</li>
+									}
+								</ul>
+							</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		}
+		if userName != "" {
+			<p class="welcome-text">Signed in as { userName }.</p>
+		}
+	</main>
+}

@@ -1,0 +1,68 @@
+package pages
+
+import (
+	"time"
+
+	layout "libratrack/web/templates"
+	"libratrack/web/templates/partials"
+)
+
+templ StartPage() {
+	@layout.Base("Project", StartContent())
+}
+
+templ StartContent() {
+	<main class="container">
+		@partials.MainNav("home")
+		<section class="hero-panel">
+			<div class="hero-copy">
+				<div class="eyebrow">Project</div>
+				<h1>Library catalog</h1>
+				<p>Manage books, authors, and records in one clean and fast interface.</p>
+			</div>
+			<div class="hero-metrics">
+				<div class="metric-card">
+					<span class="metric-label">Catalog</span>
+					<strong>Books + Authors</strong>
+				</div>
+				<div class="metric-card">
+					<span class="metric-label">Flow</span>
+					<strong>HTMX</strong>
+				</div>
+				<div class="metric-card">
+					<span class="metric-label">Live</span>
+					<div id="clock-box" class="mini-clock" hx-get="/clock" hx-trigger="every 2s" hx-target="#clock-box" hx-swap="innerHTML">
+						@ClockBox(currentClock())
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<div class="grid two-cols">
+			<section class="info-card">
+				<h2>What the project does</h2>
+				<ul class="feature-list">
+					<li>Browse the library catalog and author records.</li>
+					<li>Create, edit, and delete books directly from the interface.</li>
+					<li>Use quick search and navigation without full reloads.</li>
+					<li>Save profile details and feedback in a cookie.</li>
+				</ul>
+			</section>
+			<section class="info-card">
+				<h2>How it works</h2>
+				<p class="muted-text">
+					This project uses HTMX to load sections without reloading the page, highlight the active nav item,
+					and refresh the time indicator every 2 seconds through hx-trigger="every 2s".
+				</p>
+			</section>
+		</div>
+	</main>
+}
+
+templ ClockBox(value string) {
+	<span>{ value }</span>
+}
+
+func currentClock() string {
+	return time.Now().Format(time.RFC1123)
+}

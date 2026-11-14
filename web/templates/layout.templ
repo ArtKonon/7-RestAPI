@@ -1,0 +1,18 @@
+package templates
+
+templ Base(title string, content templ.Component) {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="utf-8" />
+			<meta name="viewport" content="width=device-width, initial-scale=1" />
+			<title>{ title }</title>
+			<link rel="stylesheet" href="/static/css/styles.css" />
+			<script src="https://unpkg.com/htmx.org@2.0.4"></script>
+		</head>
+		<body>
+			@content
+			<script src="/static/js/main.js"></script>
+		</body>
+	</html>
+}

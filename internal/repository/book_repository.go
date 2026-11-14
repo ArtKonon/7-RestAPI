@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"strings"
 
 	"libratrack/internal/model"
 
@@ -28,7 +29,24 @@ func (r *gormBookRepository) Create(book model.Book) model.Book {
 	if r.db == nil {
 		return book
 	}
-	_ = r.db.WithContext(context.Background()).Create(&book).Error
+	ctx := context.Background()
+	if category, err := r.ensureCategory(ctx, strings.TrimSpace(book.Category.Name)); err == nil && category.ID > 0 {
+		book.CategoryID = category.ID
+		book.Category = category
+	}
+	if authors, err := r.ensureAuthors(ctx, book.Authors); err == nil && len(authors) > 0 {
+		book.Authors = authors
+	}
+	if err := r.db.WithContext(ctx).Create(&book).Error; err != nil {
+		return book
+	}
+	if len(book.Authors) > 0 {
+		_ = r.db.WithContext(ctx).Model(&book).Association("Authors").Replace(book.Authors)
+	}
+	if book.CategoryID > 0 {
+		_ = r.db.WithContext(ctx).Model(&book).Update("category_id", book.CategoryID)
+	}
+	_ = r.db.WithContext(ctx).Preload("Authors").Preload("Category").First(&book, book.ID).Error
 	return book
 }
 
@@ -47,11 +65,92 @@ func (r *gormBookRepository) Update(id int, newBook model.Book) (model.Book, boo
 	if r.db == nil {
 		return model.Book{}, false
 	}
-	newBook.ID = id
-	if err := r.db.WithContext(context.Background()).Model(&model.Book{}).Where("id = ?", id).Updates(&newBook).Error; err != nil {
+	ctx := context.Background()
+	var existing model.Book
+	if err := r.db.WithContext(ctx).Preload("Authors").Preload("Category").First(&existing, id).Error; err != nil {
 		return model.Book{}, false
 	}
-	return newBook, true
+
+	if strings.TrimSpace(newBook.Title) != "" {
+		existing.Title = newBook.Title
+	}
+	if strings.TrimSpace(newBook.ISBN) != "" {
+		existing.ISBN = newBook.ISBN
+	}
+	if newBook.Description != nil {
+		existing.Description = newBook.Description
+	}
+	if strings.TrimSpace(newBook.Category.Name) != "" {
+		category, err := r.ensureCategory(ctx, newBook.Category.Name)
+		if err == nil && category.ID > 0 {
+			existing.CategoryID = category.ID
+			existing.Category = category
+		}
+	}
+	if len(newBook.Authors) > 0 {
+		authors, err := r.ensureAuthors(ctx, newBook.Authors)
+		if err == nil {
+			existing.Authors = authors
+		}
+	}
+
+	if err := r.db.WithContext(ctx).Model(&existing).Updates(map[string]interface{}{
+		"title":       existing.Title,
+		"isbn":        existing.ISBN,
+		"category_id": existing.CategoryID,
+		"description": existing.Description,
+	}).Error; err != nil {
+		return model.Book{}, false
+	}
+	if len(existing.Authors) > 0 {
+		if err := r.db.WithContext(ctx).Model(&existing).Association("Authors").Replace(existing.Authors); err != nil {
+			return model.Book{}, false
+		}
+	}
+	if err := r.db.WithContext(ctx).Preload("Authors").Preload("Category").First(&existing, id).Error; err != nil {
+		return model.Book{}, false
+	}
+	return existing, true
+}
+
+func (r *gormBookRepository) ensureCategory(ctx context.Context, name string) (model.Category, error) {
+	name = strings.TrimSpace(name)
+	if name == "" {
+		return model.Category{}, nil
+	}
+	var category model.Category
+	if err := r.db.WithContext(ctx).Where("name = ?", name).First(&category).Error; err == nil {
+		return category, nil
+	}
+	category.Name = name
+	if err := r.db.WithContext(ctx).Create(&category).Error; err != nil {
+		return model.Category{}, err
+	}
+	return category, nil
+}
+
+func (r *gormBookRepository) ensureAuthors(ctx context.Context, authors []model.Author) ([]model.Author, error) {
+	if len(authors) == 0 {
+		return nil, nil
+	}
+	result := make([]model.Author, 0, len(authors))
+	for _, author := range authors {
+		name := strings.TrimSpace(author.FullName)
+		if name == "" {
+			continue
+		}
+		var existing model.Author
+		if err := r.db.WithContext(ctx).Where("full_name = ?", name).First(&existing).Error; err == nil {
+			result = append(result, existing)
+			continue
+		}
+		existing.FullName = name
+		if err := r.db.WithContext(ctx).Create(&existing).Error; err != nil {
+			return nil, err
+		}
+		result = append(result, existing)
+	}
+	return result, nil
 }
 
 func (r *gormBookRepository) Delete(id int) bool {

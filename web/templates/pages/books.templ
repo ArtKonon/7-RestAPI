@@ -1,0 +1,57 @@
+package pages
+
+import (
+	layout "libratrack/web/templates"
+	"libratrack/web/templates/partials"
+)
+
+templ BooksPage(items []partials.BookItem, userName string) {
+	@layout.Base("Books", BooksContent(items, userName))
+}
+
+templ BooksContent(items []partials.BookItem, userName string) {
+	<main class="container">
+		@partials.MainNav("books")
+		<header class="topbar">
+			<div>
+				<h1>Books</h1>
+				<p>Overview of the catalog and quick access to create or update records.</p>
+			</div>
+			<a class="button primary" href="/books/new">Create book</a>
+		</header>
+
+		<div class="toolbar">
+			<form class="search-form" action="/books" method="get">
+				<label for="q">Search</label>
+				<input id="q" name="q" type="text" placeholder="Search by title, author or category" value="" />
+				<button class="button secondary" type="submit">Apply</button>
+			</form>
+		</div>
+
+		if len(items) == 0 {
+			@partials.EmptyState("No books are available in the library yet.")
+		} else {
+			<table class="book-table">
+				<thead>
+					<tr>
+						<th>Title</th>
+						<th>Author</th>
+						<th>Category</th>
+						<th>Status</th>
+						<th>Price</th>
+						<th>Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					for _, item := range items {
+						@partials.ItemRow(item)
+					}
+				</tbody>
+			</table>
+		}
+
+		if userName != "" {
+			<p class="welcome-text">Signed in as { userName }.</p>
+		}
+	</main>
+}

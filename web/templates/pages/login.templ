@@ -1,0 +1,45 @@
+package pages
+
+import (
+	layout "libratrack/web/templates"
+	"libratrack/web/templates/partials"
+)
+
+templ LoginPage(name string, email string, feedback string) {
+	@layout.Base("Login", LoginContent(name, email, feedback))
+}
+
+templ LoginContent(name string, email string, feedback string) {
+	<main class="container">
+		@partials.MainNav("login")
+		<header class="page-header">
+			<div class="eyebrow">Profile</div>
+			<h1>Login and feedback</h1>
+			<p class="muted-text">Enter your name and email to keep your profile and leave a quick note for the team.</p>
+		</header>
+
+		<form class="book-form" method="post" action="/login">
+			<div class="field-group">
+				<div class="field">
+					<label for="name">Name</label>
+					<input id="name" name="name" type="text" value={ name } placeholder="Your name" required />
+				</div>
+				<div class="field">
+					<label for="email">Email</label>
+					<input id="email" name="email" type="email" value={ email } placeholder="you@example.com" required />
+				</div>
+			</div>
+			<div class="field field-block">
+				<label for="feedback">Feedback</label>
+				<textarea id="feedback" name="feedback" rows="6" placeholder="Write your wishes, notes or improvement ideas here...">{ feedback }</textarea>
+			</div>
+			<div class="form-actions">
+				<button class="button primary" type="submit">Save profile</button>
+			</div>
+		</form>
+
+		if name != "" || email != "" || feedback != "" {
+			<p class="welcome-text">Saved profile: { name } · { email }</p>
+		}
+	</main>
+}

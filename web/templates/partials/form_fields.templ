@@ -1,0 +1,38 @@
+package partials
+
+type BookForm struct {
+	ID       int
+	Title    string
+	Author   string
+	Category string
+	Status   string
+	Price    string
+	Action   string
+}
+
+templ BookFormFields(form BookForm) {
+	<div class="field-group">
+		<div class="field">
+			<label for="title">Title</label>
+			<input id="title" name="title" type="text" value={ form.Title } required />
+		</div>
+		<div class="field">
+			<label for="author">Author</label>
+			<input id="author" name="author" type="text" value={ form.Author } required />
+		</div>
+	</div>
+	<div class="field-group">
+		<div class="field">
+			<label for="category">Category</label>
+			<input id="category" name="category" type="text" value={ form.Category } required />
+		</div>
+		<div class="field">
+			<label for="status">Status</label>
+			<input id="status" name="status" type="text" value={ form.Status } />
+		</div>
+	</div>
+	<div class="field">
+		<label for="price">Price</label>
+		<input id="price" name="price" type="text" value={ form.Price } />
+	</div>
+}

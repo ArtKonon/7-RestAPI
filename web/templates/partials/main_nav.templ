@@ -1,0 +1,19 @@
+package partials
+
+templ MainNav(active string) {
+	<nav class="main-nav" aria-label="Main navigation">
+		<div class="nav-links">
+			<a href="/" class={ navClass(active, "home") }>Start</a>
+			<a href="/books" class={ navClass(active, "books") }>Books</a>
+			<a href="/authors" class={ navClass(active, "authors") }>Authors</a>
+			<a href="/login" class={ navClass(active, "login") }>Login</a>
+		</div>
+	</nav>
+}
+
+func navClass(active string, expected string) string {
+	if active == expected {
+		return "nav-link active"
+	}
+	return "nav-link"
+}

@@ -1,0 +1,55 @@
+package pages
+
+import (
+	layout "libratrack/web/templates"
+	"libratrack/web/templates/partials"
+)
+
+templ BookFormPage(form partials.BookForm, title string) {
+	@layout.Base(title, BookFormContent(form, title))
+}
+
+templ BookFormContent(form partials.BookForm, title string) {
+	<main class="container">
+		@partials.MainNav("books")
+		<header class="topbar">
+			<div class="topbar-left">
+				<a class="button secondary" href="/books">Back to list</a>
+				<div>
+					<h1>{ title }</h1>
+				</div>
+			</div>
+		</header>
+
+		<form class="book-form" method="post" action={ form.Action }>
+			<div class="field-group">
+				<div class="field">
+					<label for="title">Title</label>
+					<input id="title" name="title" type="text" value={ form.Title } required />
+				</div>
+				<div class="field">
+					<label for="author">Author</label>
+					<input id="author" name="author" type="text" value={ form.Author } required />
+				</div>
+			</div>
+			<div class="field-group">
+				<div class="field">
+					<label for="category">Category</label>
+					<input id="category" name="category" type="text" value={ form.Category } required />
+				</div>
+				<div class="field">
+					<label for="status">Status</label>
+					<input id="status" name="status" type="text" value={ form.Status } />
+				</div>
+			</div>
+			<div class="field">
+				<label for="price">Price</label>
+				<input id="price" name="price" type="text" value={ form.Price } />
+			</div>
+			<div class="form-actions left">
+				<a class="button secondary" href="/books">Back to list</a>
+				<button class="button primary" type="submit">Save</button>
+			</div>
+		</form>
+	</main>
+}

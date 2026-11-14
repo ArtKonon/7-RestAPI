@@ -13,9 +13,11 @@ import (
 	"gorm.io/gorm"
 
 	"libratrack/internal/handler"
+	webhandler "libratrack/internal/handler/web"
 	"libratrack/internal/middleware"
 	"libratrack/internal/model"
 	"libratrack/internal/repository"
+	webasset "libratrack/web"
 )
 
 func NewRouter() http.Handler {
@@ -85,6 +87,7 @@ func NewRouterWithRepo(repo repository.BookRepository) http.Handler {
 		c.JSON(http.StatusOK, gin.H{"status": "ok"})
 	})
 	mountSwagger(router)
+	registerWebRoutes(router, repo)
 
 	api := router.Group("/api/v1")
 	books := api.Group("/books")
@@ -97,6 +100,22 @@ func NewRouterWithRepo(repo repository.BookRepository) http.Handler {
 	return router
 }
 
+func registerWebRoutes(router *gin.Engine, repo repository.BookRepository) {
+	h := webhandler.NewHandler(repo)
+	router.GET("/", func(c *gin.Context) { h.StartPage(c.Writer, c.Request) })
+	router.GET("/clock", func(c *gin.Context) { h.Clock(c.Writer, c.Request) })
+	router.GET("/books", func(c *gin.Context) { h.ListBooksPage(c.Writer, c.Request) })
+	router.GET("/books/new", func(c *gin.Context) { h.NewBookPage(c.Writer, c.Request) })
+	router.POST("/books", func(c *gin.Context) { h.CreateBook(c.Writer, c.Request) })
+	router.GET("/books/:id/edit", func(c *gin.Context) { h.EditBookPage(c.Writer, c.Request) })
+	router.POST("/books/:id", func(c *gin.Context) { h.UpdateBook(c.Writer, c.Request) })
+	router.DELETE("/books/:id", func(c *gin.Context) { h.DeleteBook(c.Writer, c.Request) })
+	router.GET("/authors", func(c *gin.Context) { h.AuthorsPage(c.Writer, c.Request) })
+	router.GET("/login", func(c *gin.Context) { h.LoginPage(c.Writer, c.Request) })
+	router.POST("/login", func(c *gin.Context) { h.SaveProfile(c.Writer, c.Request) })
+	router.GET("/static/*filepath", gin.WrapH(http.StripPrefix("/static/", http.FileServer(http.FS(webasset.AssetFS)))))
+}
+
 func NewRouterWithDB(db *gorm.DB) http.Handler {
 	router := gin.New()
 	router.Use(middleware.Logger())
@@ -107,6 +126,7 @@ func NewRouterWithDB(db *gorm.DB) http.Handler {
 		c.JSON(http.StatusOK, gin.H{"status": "ok"})
 	})
 	mountSwagger(router)
+	registerWebRoutes(router, repository.NewGormBookRepository(db))
 
 	api := router.Group("/api/v1")
 	registerAuthRoutes(api, db)
