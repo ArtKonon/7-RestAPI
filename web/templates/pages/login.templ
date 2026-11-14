@@ -26,7 +26,7 @@ templ LoginContent(name string, email string, feedback string, savedName string,
 				</div>
 				<div class="field">
 					<label for="email">Email</label>
-					<input id="email" name="email" type="email" value={ email } placeholder="you@example.com" oninvalid="this.setCustomValidity(this.value.trim() ? 'Please enter a valid email address.' : 'Please fill out this field.')" oninput="this.setCustomValidity('')" />
+					<input id="email" name="email" type="text" inputmode="email" value={ email } placeholder="you@example.com" oninvalid="this.setCustomValidity('Please fill out this field.')" oninput="this.setCustomValidity('')" />
 				</div>
 			</div>
 			<div class="field field-block">
@@ -57,7 +57,8 @@ templ LoginContent(name string, email string, feedback string, savedName string,
 					return false;
 				}
 
-				const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue) || /^[^\s@]+@[^\s@]+$/.test(emailValue);
+				const emailPattern = /^[^\s@]+@[^\s@]+(?:\.[^\s@]+)+$/;
+				const validEmail = emailPattern.test(emailValue);
 				emailField.setCustomValidity(validEmail ? '' : 'Please enter a valid email address.');
 				if (!validEmail) {
 					emailField.reportValidity();

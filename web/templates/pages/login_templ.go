@@ -77,20 +77,20 @@ func LoginContent(name string, email string, feedback string, savedName string, 
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\" placeholder=\"Your name\" oninvalid=\"this.setCustomValidity('Please fill out this field.')\" oninput=\"this.setCustomValidity('')\"></div><div class=\"field\"><label for=\"email\">Email</label> <input id=\"email\" name=\"email\" type=\"email\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\" placeholder=\"Your name\" oninvalid=\"this.setCustomValidity('Please fill out this field.')\" oninput=\"this.setCustomValidity('')\"></div><div class=\"field\"><label for=\"email\">Email</label> <input id=\"email\" name=\"email\" type=\"text\" inputmode=\"email\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templruntime.NewAttributeExpression(email).Resolve(ctx)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/templates/pages/login.templ`, Line: 29, Col: 62}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/templates/pages/login.templ`, Line: 29, Col: 79}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var4)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" placeholder=\"you@example.com\" oninvalid=\"this.setCustomValidity(this.value.trim() ? 'Please enter a valid email address.' : 'Please fill out this field.')\" oninput=\"this.setCustomValidity('')\"></div></div><div class=\"field field-block\"><label for=\"feedback\">Feedback</label> <textarea id=\"feedback\" name=\"feedback\" rows=\"6\" placeholder=\"Write your wishes, notes or improvement ideas here...\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" placeholder=\"you@example.com\" oninvalid=\"this.setCustomValidity('Please fill out this field.')\" oninput=\"this.setCustomValidity('')\"></div></div><div class=\"field field-block\"><label for=\"feedback\">Feedback</label> <textarea id=\"feedback\" name=\"feedback\" rows=\"6\" placeholder=\"Write your wishes, notes or improvement ideas here...\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -103,7 +103,7 @@ func LoginContent(name string, email string, feedback string, savedName string, 
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</textarea></div><div class=\"form-actions\"><button class=\"button primary\" type=\"submit\">Save profile</button></div></form><script>\n\t\t\tfunction validateLoginForm(form) {\n\t\t\t\tconst nameField = form.querySelector('#name');\n\t\t\t\tconst emailField = form.querySelector('#email');\n\t\t\t\tconst nameValue = nameField.value.trim();\n\t\t\t\tconst emailValue = emailField.value.trim();\n\n\t\t\t\tif (!nameValue) {\n\t\t\t\t\tnameField.setCustomValidity('Please fill out this field.');\n\t\t\t\t\tnameField.reportValidity();\n\t\t\t\t\treturn false;\n\t\t\t\t}\n\t\t\t\tnameField.setCustomValidity('');\n\n\t\t\t\tif (!emailValue) {\n\t\t\t\t\temailField.setCustomValidity('Please fill out this field.');\n\t\t\t\t\temailField.reportValidity();\n\t\t\t\t\treturn false;\n\t\t\t\t}\n\n\t\t\t\tconst validEmail = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(emailValue) || /^[^\\s@]+@[^\\s@]+$/.test(emailValue);\n\t\t\t\temailField.setCustomValidity(validEmail ? '' : 'Please enter a valid email address.');\n\t\t\t\tif (!validEmail) {\n\t\t\t\t\temailField.reportValidity();\n\t\t\t\t\treturn false;\n\t\t\t\t}\n\n\t\t\t\treturn true;\n\t\t\t}\n\t\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</textarea></div><div class=\"form-actions\"><button class=\"button primary\" type=\"submit\">Save profile</button></div></form><script>\n\t\t\tfunction validateLoginForm(form) {\n\t\t\t\tconst nameField = form.querySelector('#name');\n\t\t\t\tconst emailField = form.querySelector('#email');\n\t\t\t\tconst nameValue = nameField.value.trim();\n\t\t\t\tconst emailValue = emailField.value.trim();\n\n\t\t\t\tif (!nameValue) {\n\t\t\t\t\tnameField.setCustomValidity('Please fill out this field.');\n\t\t\t\t\tnameField.reportValidity();\n\t\t\t\t\treturn false;\n\t\t\t\t}\n\t\t\t\tnameField.setCustomValidity('');\n\n\t\t\t\tif (!emailValue) {\n\t\t\t\t\temailField.setCustomValidity('Please fill out this field.');\n\t\t\t\t\temailField.reportValidity();\n\t\t\t\t\treturn false;\n\t\t\t\t}\n\n\t\t\t\tconst emailPattern = /^[^\\s@]+@[^\\s@]+(?:\\.[^\\s@]+)+$/;\n\t\t\t\tconst validEmail = emailPattern.test(emailValue);\n\t\t\t\temailField.setCustomValidity(validEmail ? '' : 'Please enter a valid email address.');\n\t\t\t\tif (!validEmail) {\n\t\t\t\t\temailField.reportValidity();\n\t\t\t\t\treturn false;\n\t\t\t\t}\n\n\t\t\t\treturn true;\n\t\t\t}\n\t\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -115,7 +115,7 @@ func LoginContent(name string, email string, feedback string, savedName string, 
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(savedName)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/templates/pages/login.templ`, Line: 72, Col: 53}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/templates/pages/login.templ`, Line: 73, Col: 53}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
@@ -128,7 +128,7 @@ func LoginContent(name string, email string, feedback string, savedName string, 
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(savedEmail)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/templates/pages/login.templ`, Line: 72, Col: 71}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/templates/pages/login.templ`, Line: 73, Col: 71}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
