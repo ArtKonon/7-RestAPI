@@ -101,13 +101,14 @@ code {
 }
 
 .toolbar {
-  margin: 16px 0 20px;
+  margin: 18px 0 20px;
 }
 
 .search-form {
   display: flex;
   align-items: center;
   gap: 12px;
+  width: 100%;
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -301,6 +302,40 @@ code {
   margin-top: 12px;
 }
 
+.process-list {
+  display: grid;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.process-item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: start;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #f8fafc;
+  border: 1px solid var(--border);
+}
+
+.process-item p {
+  margin-top: 4px;
+  color: var(--muted);
+}
+
+.step-index {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: var(--primary-soft);
+  color: var(--primary);
+  font-weight: 700;
+}
+
 .clock-box {
   margin-top: 12px;
   background: #f8fafc;
@@ -334,6 +369,13 @@ code {
 
 .hero-copy p {
   font-size: 1.05rem;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 18px;
 }
 
 .hero-metrics {

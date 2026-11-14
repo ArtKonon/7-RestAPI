@@ -5,11 +5,11 @@ import (
 	"libratrack/web/templates/partials"
 )
 
-templ BooksPage(items []partials.BookItem, userName string) {
-	@layout.Base("Books", BooksContent(items, userName))
+templ BooksPage(items []partials.BookItem, userName string, query string) {
+	@layout.Base("Books", BooksContent(items, userName, query))
 }
 
-templ BooksContent(items []partials.BookItem, userName string) {
+templ BooksContent(items []partials.BookItem, userName string, query string) {
 	<main class="container">
 		@partials.MainNav("books")
 		<header class="topbar">
@@ -21,9 +21,9 @@ templ BooksContent(items []partials.BookItem, userName string) {
 		</header>
 
 		<div class="toolbar">
-			<form class="search-form" action="/books" method="get">
+			<form class="search-form" action="/books" method="get" hx-get="/books" hx-trigger="input changed delay:250ms" hx-select="main" hx-target="body" hx-swap="innerHTML" hx-push-url="true">
 				<label for="q">Search</label>
-				<input id="q" name="q" type="text" placeholder="Search by title, author or category" value="" />
+				<input id="q" name="q" type="text" placeholder="Search by title, author or category" value={ query } />
 				<button class="button secondary" type="submit">Apply</button>
 			</form>
 		</div>

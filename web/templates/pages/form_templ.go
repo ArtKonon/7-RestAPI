@@ -103,7 +103,7 @@ func BookFormContent(form partials.BookForm, title string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" required></div><div class=\"field\"><label for=\"author\">Author</label> <input id=\"author\" name=\"author\" type=\"text\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" required oninvalid=\"this.setCustomValidity('Please fill out this field.')\" oninput=\"this.setCustomValidity('')\"></div><div class=\"field\"><label for=\"author\">Author</label> <input id=\"author\" name=\"author\" type=\"text\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -116,7 +116,7 @@ func BookFormContent(form partials.BookForm, title string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" required></div></div><div class=\"field-group\"><div class=\"field\"><label for=\"category\">Category</label> <input id=\"category\" name=\"category\" type=\"text\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" required oninvalid=\"this.setCustomValidity('Please fill out this field.')\" oninput=\"this.setCustomValidity('')\"></div></div><div class=\"field-group\"><div class=\"field\"><label for=\"category\">Category</label> <input id=\"category\" name=\"category\" type=\"text\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -129,7 +129,7 @@ func BookFormContent(form partials.BookForm, title string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" required></div><div class=\"field\"><label for=\"status\">Status</label> <input id=\"status\" name=\"status\" type=\"text\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" required oninvalid=\"this.setCustomValidity('Please fill out this field.')\" oninput=\"this.setCustomValidity('')\"></div><div class=\"field\"><label for=\"status\">Status</label> <input id=\"status\" name=\"status\" type=\"text\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

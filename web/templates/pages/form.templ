@@ -25,17 +25,17 @@ templ BookFormContent(form partials.BookForm, title string) {
 			<div class="field-group">
 				<div class="field">
 					<label for="title">Title</label>
-					<input id="title" name="title" type="text" value={ form.Title } required />
+					<input id="title" name="title" type="text" value={ form.Title } required oninvalid="this.setCustomValidity('Please fill out this field.')" oninput="this.setCustomValidity('')" />
 				</div>
 				<div class="field">
 					<label for="author">Author</label>
-					<input id="author" name="author" type="text" value={ form.Author } required />
+					<input id="author" name="author" type="text" value={ form.Author } required oninvalid="this.setCustomValidity('Please fill out this field.')" oninput="this.setCustomValidity('')" />
 				</div>
 			</div>
 			<div class="field-group">
 				<div class="field">
 					<label for="category">Category</label>
-					<input id="category" name="category" type="text" value={ form.Category } required />
+					<input id="category" name="category" type="text" value={ form.Category } required oninvalid="this.setCustomValidity('Please fill out this field.')" oninput="this.setCustomValidity('')" />
 				</div>
 				<div class="field">
 					<label for="status">Status</label>

@@ -25,11 +25,13 @@ templ AuthorsContent(authors []AuthorCard, userName string, query string) {
 			</div>
 		</header>
 
-		<form class="search-form" method="get" action="/authors">
-			<label for="q">Search</label>
-			<input id="q" name="q" type="text" value={ query } placeholder="Search by author, title or bio" />
-			<button class="button secondary" type="submit">Apply</button>
-		</form>
+		<div class="toolbar">
+			<form class="search-form" method="get" action="/authors" hx-get="/authors" hx-trigger="input changed delay:250ms" hx-select="main" hx-target="body" hx-swap="innerHTML" hx-push-url="true">
+				<label for="q">Search</label>
+				<input id="q" name="q" type="text" value={ query } placeholder="Search by author, title or bio" />
+				<button class="button secondary" type="submit">Apply</button>
+			</form>
+		</div>
 
 		if len(authors) == 0 {
 			@partials.EmptyState("No authors match the current search.")

@@ -66,7 +66,7 @@ func StartContent() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<section class=\"hero-panel\"><div class=\"hero-copy\"><div class=\"eyebrow\">Project</div><h1>Library catalog</h1><p>Manage books, authors, and records in one clean and fast interface.</p></div><div class=\"hero-metrics\"><div class=\"metric-card\"><span class=\"metric-label\">Catalog</span> <strong>Books + Authors</strong></div><div class=\"metric-card\"><span class=\"metric-label\">Flow</span> <strong>HTMX</strong></div><div class=\"metric-card\"><span class=\"metric-label\">Live</span><div id=\"clock-box\" class=\"mini-clock\" hx-get=\"/clock\" hx-trigger=\"every 2s\" hx-target=\"#clock-box\" hx-swap=\"innerHTML\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<section class=\"hero-panel\"><div class=\"hero-copy\"><div class=\"eyebrow\">Project overview</div><h1>Library catalog</h1><p>A lightweight reading room for discovering books, keeping track of authors, and moving through a catalog without friction. It is a small web app for librarians, readers, and curious visitors who want a clean place to explore what the library has to offer.</p><div class=\"hero-actions\"><a class=\"button primary\" href=\"/books\">Open catalog</a> <a class=\"button secondary\" href=\"/authors\">Browse authors</a></div><div class=\"tag-list\"><span>Go</span> <span>HTMX</span> <span>Web UI</span> <span>Catalog</span></div></div><div class=\"hero-metrics\"><div class=\"metric-card\"><span class=\"metric-label\">Catalog</span> <strong>Books + Authors</strong></div><div class=\"metric-card\"><span class=\"metric-label\">Flow</span> <strong>HTMX + Go</strong></div><div class=\"metric-card\"><span class=\"metric-label\">Live</span><div id=\"clock-box\" class=\"mini-clock\" hx-get=\"/clock\" hx-trigger=\"every 2s\" hx-target=\"#clock-box\" hx-swap=\"innerHTML\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -74,7 +74,7 @@ func StartContent() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</div></div></div></section><div class=\"grid two-cols\"><section class=\"info-card\"><h2>What the project does</h2><ul class=\"feature-list\"><li>Browse the library catalog and author records.</li><li>Create, edit, and delete books directly from the interface.</li><li>Use quick search and navigation without full reloads.</li><li>Save profile details and feedback in a cookie.</li></ul></section><section class=\"info-card\"><h2>How it works</h2><p class=\"muted-text\">This project uses HTMX to load sections without reloading the page, highlight the active nav item, and refresh the time indicator every 2 seconds through hx-trigger=\"every 2s\".</p></section></div></main>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</div></div></div></section><div class=\"grid two-cols\"><section class=\"info-card\"><h2>What the project is</h2><p class=\"muted-text\">This project is a compact library management interface: a place to list books, track authors, search the catalog quickly, and keep the experience fast and readable. It is designed to show how a simple web application can combine a clean Go backend, structured templates, and dynamic interaction without making the UI feel heavy.</p><ul class=\"feature-list\"><li>Browse a living catalog of books and author records.</li><li>Search by title, author, or category without losing context.</li><li>Create, edit, and remove catalog entries through a focused interface.</li><li>Store a simple user profile and feedback in a cookie for a more personal flow.</li></ul></section><section class=\"info-card\"><h2>How it works</h2><div class=\"process-list\"><div class=\"process-item\"><span class=\"step-index\">1</span><div><strong>Discover</strong><p>Entries are grouped into a book catalog and author index so visitors can move naturally.</p></div></div><div class=\"process-item\"><span class=\"step-index\">2</span><div><strong>Filter</strong><p>Search narrows the list in place, helping users quickly find what matters.</p></div></div><div class=\"process-item\"><span class=\"step-index\">3</span><div><strong>Refresh</strong><p>HTMX keeps the time indicator ticking and sections feeling alive without the usual page churn.</p></div></div></div></section></div></main>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -106,7 +106,7 @@ func ClockBox(value string) templ.Component {
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(value)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/templates/pages/start.templ`, Line: 63, Col: 14}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/templates/pages/start.templ`, Line: 102, Col: 14}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {

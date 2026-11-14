@@ -16,8 +16,10 @@ func (h *Handler) ListBooksPage(w http.ResponseWriter, r *http.Request) {
 	for _, book := range books {
 		items = append(items, toBookItem(book))
 	}
-	page := pages.BooksPage(items, profile.Name)
-	h.renderPage(w, r, page, pages.BooksContent(items, profile.Name), http.StatusOK)
+	query := strings.TrimSpace(r.URL.Query().Get("q"))
+	items = filterBookItems(items, query)
+	page := pages.BooksPage(items, profile.Name, query)
+	h.renderPage(w, r, page, pages.BooksContent(items, profile.Name, query), http.StatusOK)
 }
 
 func (h *Handler) NewBookPage(w http.ResponseWriter, r *http.Request) {
@@ -124,12 +126,27 @@ func (h *Handler) DeleteBook(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) SearchBooks(w http.ResponseWriter, r *http.Request) {
 	term := strings.TrimSpace(r.URL.Query().Get("q"))
 	books := h.repo.List()
-	filtered := make([]partials.BookItem, 0, len(books))
+	items := make([]partials.BookItem, 0, len(books))
 	for _, book := range books {
-		item := toBookItem(book)
-		if term == "" || strings.Contains(strings.ToLower(item.Title), strings.ToLower(term)) || strings.Contains(strings.ToLower(item.Author), strings.ToLower(term)) || strings.Contains(strings.ToLower(item.Category), strings.ToLower(term)) {
+		items = append(items, toBookItem(book))
+	}
+	filtered := filterBookItems(items, term)
+	h.renderPage(w, r, pages.BooksPage(filtered, readProfileCookie(r).Name, term), pages.BooksContent(filtered, readProfileCookie(r).Name, term), http.StatusOK)
+}
+
+func filterBookItems(items []partials.BookItem, query string) []partials.BookItem {
+	term := strings.TrimSpace(query)
+	if term == "" {
+		return items
+	}
+	needle := strings.ToLower(term)
+	filtered := make([]partials.BookItem, 0, len(items))
+	for _, item := range items {
+		if strings.Contains(strings.ToLower(item.Title), needle) ||
+			strings.Contains(strings.ToLower(item.Author), needle) ||
+			strings.Contains(strings.ToLower(item.Category), needle) {
 			filtered = append(filtered, item)
 		}
 	}
-	h.renderPage(w, r, pages.BooksPage(filtered, readProfileCookie(r).Name), pages.BooksContent(filtered, readProfileCookie(r).Name), http.StatusOK)
+	return filtered
 }
